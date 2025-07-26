@@ -1,0 +1,92 @@
+
+{
+  "Basisteori": [
+    "BT 1: Introduktion til militæret (2t)",
+    "BT 2: Militære værdier (2t)",
+    "BT 3: Kommandostruktur (2t)",
+    "BT 4: Sikkerhed og sikring (3t)",
+    "BT 5: Første hjælp (4t)",
+    "BT 6: Kommunikation (2t)",
+    "BT 7: Navigation (3t)",
+    "BT 8: Våbensikkerhed (2t)",
+    "BT 9: Taktiske principper (3t)",
+    "BT 10: Militær historie (2t)",
+    "BT 11: Folkeret (2t)",
+    "BT 12: Stress og mental sundhed (2t)",
+    "BT 13: Fysisk træning grundlag (2t)",
+    "BT 14: Teamwork (2t)",
+    "BT 15: Leadership basics (3t)",
+    "BT 16: Logistik grundlag (2t)",
+    "BT 17: Rapportering (2t)",
+    "BT 18: Evaluering og test (4t)"
+  ],
+  "Hvervning": [
+    "HVER 1: Rekruttering proces (2t)",
+    "HVERV 2A: Kontrakt og vilkår del 1 (2t)",
+    "HVERV 2B: Kontrakt og vilkår del 2 (2t)",
+    "HVERV 3: Karriereveje (3t)",
+    "HVERV 4: Forfremmelse (2t)",
+    "HVERV 5: Ansvar og rettigheder (2t)",
+    "HVERV 6: Arbejdsmiljø (2t)",
+    "HVERV 7: Sociale forhold (2t)",
+    "HVERV 8: Økonomi og løn (2t)"
+  ],
+  "CBRN": [
+    "CBRN 1: Kemiske trusler (3t)",
+    "CBRN 2: Biologiske trusler (3t)",
+    "CBRN 3: Radiologiske trusler (3t)",
+    "CBRN 4: Nukleare trusler (3t)",
+    "CBRN 5: Beskyttelsesudstyr (4t)",
+    "CBRN 6: Dekontaminering (4t)",
+    "CBRN 7: Praktisk øvelse (6t)"
+  ],
+  "Skydning": [
+    "SKYT 1: Våbensikkerhed teori (2t)",
+    "SKYT 2: Sigte teknik (3t)",
+    "SKYT 3: Skydebane øvelser dag 1 (4t)",
+    "SKYT 4: Skydebane øvelser dag 2 (4t)",
+    "SKYT 5: Præcisionsskydning (4t)",
+    "SKYT 6: Kampskyning (6t)",
+    "SKYT 7: Vedligeholdelse (2t)",
+    "SKYT 8: Natskydning (4t)",
+    "SKYT 9: Evaluering (3t)",
+    "SKYT 10: Afsluttende test (4t)"
+  ],
+  "Våbenuddannelse": [
+    "GV 1: Håndvåben introduktion (2t)",
+    "GV 2: Håndvåben praksis (4t)",
+    "GV 3: Automatvåben teori (2t)",
+    "GV 4: Automatvåben praksis (4t)",
+    "GV 5: Støttevåben (4t)",
+    "GV 6: Vedligeholdelse grundlæggende (3t)",
+    "GV 7: Vedligeholdelse avanceret (3t)",
+    "GV 8: Ammunition håndtering (2t)",
+    "GV 9: Sikkerhedsprocedurer (2t)",
+    "GV 10: Praktisk eksamen (4t)"
+  ],
+  "Fysisk træning": [
+    "MFT 1: Konditionstræning grundlag (2t)",
+    "MFT 2: Styrketræning (2t)",
+    "MFT 3: Udholdenhed opbygning (2t)",
+    "MFT 4: Militær fitness test forberedelse (2t)",
+    "MFT 5: Teambuilding øvelser (3t)",
+    "MFT 6: Militær fitness test (4t)",
+    "MFT 7: Rehabilitering og skadeforebyggelse (2t)",
+    "MFT 8: Avanceret konditionstræning (2t)"
+  ],
+  "Eksercits": [
+    "EKS 1: March øvelser grundlag (2t)",
+    "EKS 2: Formation træning (2t)",
+    "EKS 3: Ceremonier introduktion (2t)",
+    "EKS 4: Parade træning dag 1 (3t)",
+    "EKS 5: Parade træning dag 2 (3t)",
+    "EKS 6: Kommando og kontrol (2t)",
+    "EKS 7: Præsentation øvelser (3t)",
+    "EKS 8: Afsluttende ceremoni (4t)"
+  ],
+  "Feltøvelser": [
+    "FELT 1: Basis feltfærdigheder (5 dage)",
+    "FELT 2: Avanceret taktik (5 dage)",
+    "REX: Samlet øvelse (5 dage)"
+  ]
+}

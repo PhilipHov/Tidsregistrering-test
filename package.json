@@ -1,0 +1,11 @@
+{
+  "name": "planops-final",
+  "version": "1.0.0",
+  "description": "PLANOPS MVP med HTML, CSS, JS og plukark data",
+  "scripts": {
+    "start": "live-server"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

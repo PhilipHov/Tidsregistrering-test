@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test FullCalendar</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css' rel='stylesheet' />
+</head>
+<body>
+  <h1>Test FullCalendar</h1>
+  <div id="test-calendar" style="height: 400px;"></div>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js'></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Test: DOM loaded');
+      
+      if (typeof FullCalendar === 'undefined') {
+        console.error('Test: FullCalendar is not loaded!');
+        document.getElementById('test-calendar').innerHTML = '<p style="color: red;">FullCalendar ikke indlæst!</p>';
+        return;
+      }
+      
+      console.log('Test: FullCalendar is loaded');
+      
+      try {
+        const calendar = new FullCalendar.Calendar(document.getElementById('test-calendar'), {
+          initialView: 'dayGridMonth',
+          initialDate: '2025-08-01',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+          },
+          events: [
+            {
+              title: 'Test Event',
+              start: '2025-08-15'
+            }
+          ]
+        });
+        
+        calendar.render();
+        console.log('Test: Calendar rendered successfully');
+      } catch (error) {
+        console.error('Test: Error creating calendar:', error);
+        document.getElementById('test-calendar').innerHTML = '<p style="color: red;">Fejl: ' + error.message + '</p>';
+      }
+    });
+  </script>
+</body>
+</html> 

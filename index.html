@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLANOPS Arbejdstidsstyring</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css' rel='stylesheet' />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>PLANOPS</h1>
+    <h2>Arbejdstidsstyring</h2>
+  </header>
+
+  <div class="main-tabs-container">
+    <div class="main-tabs">
+      <button class="main-tab-button active" onclick="showMainTab('akos')">AKOS</button>
+      <button class="main-tab-button" onclick="showMainTab('skema')">SKEMA</button>
+      <button class="main-tab-button" onclick="showMainTab('arbtid')">ARBEJDSTID</button>
+      <button class="main-tab-button" onclick="showMainTab('oversigt')">OVERSIGT</button>
+    </div>
+
+    <!-- AKOS Tab -->
+    <div id="akos-tab" class="main-tab-content active">
+      <div class="controls">
+        <h4>Opret ny AKOS</h4>
+
+        <div style="margin-bottom: 1rem;">
+          <label for="enhSelect">Vælg ENH:</label>
+          <select id="enhSelect" style="margin-right: 1rem;">
+            <option value="uddannelse">Uddannelsesenhed</option>
+            <option value="professionel">Professionel enhed</option>
+            <option value="lgr">LG: HBU/HRU</option>
+            <option value="ghr">GHR: HBU/HRU/MBU</option>
+          </select>
+
+
+        </div>
+
+
+
+        <div class="subjects">
+          <label>Plukark - Vælg fag/aktiviteter:</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="Basisteori" checked> Basisteori</label>
+            <label><input type="checkbox" id="Hvervning" checked> Hvervning</label>
+            <label><input type="checkbox" id="CBRN" checked> CBRN</label>
+            <label><input type="checkbox" id="Skydning" checked> Skydning</label>
+            <label><input type="checkbox" id="Våbenuddannelse" checked> Våbenuddannelse</label>
+            <label><input type="checkbox" id="Fysisk træning" checked> Fysisk træning</label>
+            <label><input type="checkbox" id="Eksercits" checked> Eksercits</label>
+            <label><input type="checkbox" id="Feltøvelser" checked> Feltøvelser</label>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <label for="startDate">Samlet startdato:</label>
+          <input type="date" id="startDate" value="2025-08-01" />
+          <label for="endDate">Samlet slutdato:</label>
+          <input type="date" id="endDate" value="2025-12-31" />
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <button id="generateBtn">Generér AKOS</button>
+
+          <button id="importAkosBtn">Hent AKOS fra anden ENH</button>
+        </div>
+
+        <div id="akosStatus" style="margin-top: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 3px; display: none;">
+          <h5>AKOS Status:</h5>
+          <div id="missingLessons"></div>
+          <div id="sequenceWarnings"></div>
+        </div>
+      </div>
+      <div id='calendar'></div>
+    </div>
+
+    <!-- SKEMA Tab -->
+    <div id="skema-tab" class="main-tab-content">
+      <h3>SKEMA</h3>
+      <div class="week-selector">
+        <label for="weekSelect">Vælg uge:</label>
+        <select id="weekSelect">
+          <option value="">Vælg uge...</option>
+        </select>
+        <button id="generateSkemaBtn">Generer Skema</button>
+      </div>
+      <div id="skema-content">
+        <!-- DEL Selector -->
+        <div style="margin-bottom: 1rem;">
+          <label for="delSelect">Vælg DEL:</label>
+          <select id="delSelect" style="margin-right: 1rem;">
+            <option value="1">1. DEL</option>
+            <option value="2">2. DEL</option>
+            <option value="3">3. DEL</option>
+            <option value="4">4. DEL</option>
+          </select>
+        </div>
+
+        <!-- 1. DEL Skema -->
+        <div id="del1-skema" class="del-skema">
+          <h4>1. DEL Skema</h4>
+          <table id="skemaTable1" class="skema-table">
+            <thead>
+              <tr>
+                <th>DATO</th>
+                <th>TID</th>
+                <th>ENH</th>
+                <th>AKTIVITET</th>
+                <th>LEDER</th>
+                <th>PÅKL.</th>
+                <th>STED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Activities will be generated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 2. DEL Skema -->
+        <div id="del2-skema" class="del-skema" style="display: none;">
+          <h4>2. DEL Skema</h4>
+          <table id="skemaTable2" class="skema-table">
+            <thead>
+              <tr>
+                <th>DATO</th>
+                <th>TID</th>
+                <th>ENH</th>
+                <th>AKTIVITET</th>
+                <th>LEDER</th>
+                <th>PÅKL.</th>
+                <th>STED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Activities will be generated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3. DEL Skema -->
+        <div id="del3-skema" class="del-skema" style="display: none;">
+          <h4>3. DEL Skema</h4>
+          <table id="skemaTable3" class="skema-table">
+            <thead>
+              <tr>
+                <th>DATO</th>
+                <th>TID</th>
+                <th>ENH</th>
+                <th>AKTIVITET</th>
+                <th>LEDER</th>
+                <th>PÅKL.</th>
+                <th>STED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Activities will be generated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 4. DEL Skema -->
+        <div id="del4-skema" class="del-skema" style="display: none;">
+          <h4>4. DEL Skema</h4>
+          <table id="skemaTable4" class="skema-table">
+            <thead>
+              <tr>
+                <th>DATO</th>
+                <th>TID</th>
+                <th>ENH</th>
+                <th>AKTIVITET</th>
+                <th>LEDER</th>
+                <th>PÅKL.</th>
+                <th>STED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Activities will be generated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARBEJDSTID Tab -->
+    <div id="arbtid-tab" class="main-tab-content">
+      <h3>ARBEJDSTID</h3>
+
+      <!-- DEL 1 - Combined with details -->
+      <h4>1. DEL</h4>
+      <table id="del1Table">
+        <thead>
+          <tr>
+            <th>Navn</th>
+            <th>Timer</th>
+            <th>Overtid</th>
+            <th>Status</th>
+            <th>AFSP Plan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-a1', 'Sergent A1')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent A1</button></td>
+            <td id="sgt-a1-hours">158</td>
+            <td id="sgt-a1-overtime">21</td>
+            <td id="sgt-a1-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-a1')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-a1')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-a1')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-a2', 'Sergent A2')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent A2</button></td>
+            <td id="sgt-a2-hours">142</td>
+            <td id="sgt-a2-overtime">5</td>
+            <td id="sgt-a2-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-a2')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-a2')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-a2')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-a3', 'Sergent A3')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent A3</button></td>
+            <td id="sgt-a3-hours">135</td>
+            <td id="sgt-a3-overtime">0</td>
+            <td id="sgt-a3-status">Under</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-a3')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-a3')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-a3')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-a4', 'Sergent A4')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent A4</button></td>
+            <td id="sgt-a4-hours">159</td>
+            <td id="sgt-a4-overtime">22</td>
+            <td id="sgt-a4-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-a4')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-a4')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-a4')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-a5', 'Sergent A5')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent A5</button></td>
+            <td id="sgt-a5-hours">139</td>
+            <td id="sgt-a5-overtime">2</td>
+            <td id="sgt-a5-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-a5')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-a5')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-a5')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- DEL 2 - Combined with details -->
+      <h4>2. DEL</h4>
+      <table id="del2Table">
+        <thead>
+          <tr>
+            <th>Navn</th>
+            <th>Timer</th>
+            <th>Overtid</th>
+            <th>Status</th>
+            <th>AFSP Plan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-b1', 'Sergent B1')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent B1</button></td>
+            <td id="sgt-b1-hours">160</td>
+            <td id="sgt-b1-overtime">23</td>
+            <td id="sgt-b1-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-b1')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-b1')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-b1')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-b2', 'Sergent B2')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent B2</button></td>
+            <td id="sgt-b2-hours">140</td>
+            <td id="sgt-b2-overtime">3</td>
+            <td id="sgt-b2-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-b2')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-b2')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-b2')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-b3', 'Sergent B3')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent B3</button></td>
+            <td id="sgt-b3-hours">138</td>
+            <td id="sgt-b3-overtime">1</td>
+            <td id="sgt-b3-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-b3')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-b3')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-b3')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-b4', 'Sergent B4')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent B4</button></td>
+            <td id="sgt-b4-hours">158</td>
+            <td id="sgt-b4-overtime">21</td>
+            <td id="sgt-b4-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-b4')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-b4')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-b4')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-b5', 'Sergent B5')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent B5</button></td>
+            <td id="sgt-b5-hours">132</td>
+            <td id="sgt-b5-overtime">0</td>
+            <td id="sgt-b5-status">Under</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-b5')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-b5')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-b5')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- DEL 3 - Combined with details -->
+      <h4>3. DEL</h4>
+      <table id="del3Table">
+        <thead>
+          <tr>
+            <th>Navn</th>
+            <th>Timer</th>
+            <th>Overtid</th>
+            <th>Status</th>
+            <th>AFSP Plan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-c1', 'Sergent C1')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent C1</button></td>
+            <td id="sgt-c1-hours">143</td>
+            <td id="sgt-c1-overtime">6</td>
+            <td id="sgt-c1-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-c1')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-c1')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-c1')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-c2', 'Sergent C2')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent C2</button></td>
+            <td id="sgt-c2-hours">162</td>
+            <td id="sgt-c2-overtime">25</td>
+            <td id="sgt-c2-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-c2')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-c2')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-c2')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-c3', 'Sergent C3')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent C3</button></td>
+            <td id="sgt-c3-hours">137</td>
+            <td id="sgt-c3-overtime">0</td>
+            <td id="sgt-c3-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-c3')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-c3')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-c3')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-c4', 'Sergent C4')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent C4</button></td>
+            <td id="sgt-c4-hours">158</td>
+            <td id="sgt-c4-overtime">21</td>
+            <td id="sgt-c4-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-c4')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-c4')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-c4')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-c5', 'Sergent C5')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent C5</button></td>
+            <td id="sgt-c5-hours">134</td>
+            <td id="sgt-c5-overtime">0</td>
+            <td id="sgt-c5-status">Under</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-c5')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-c5')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-c5')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- DEL 4 - Combined with details -->
+      <h4>4. DEL</h4>
+      <table id="del4Table">
+        <thead>
+          <tr>
+            <th>Navn</th>
+            <th>Timer</th>
+            <th>Overtid</th>
+            <th>Status</th>
+            <th>AFSP Plan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-d1', 'Sergent D1')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent D1</button></td>
+            <td id="sgt-d1-hours">161</td>
+            <td id="sgt-d1-overtime">24</td>
+            <td id="sgt-d1-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-d1')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-d1')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-d1')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-d2', 'Sergent D2')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent D2</button></td>
+            <td id="sgt-d2-hours">144</td>
+            <td id="sgt-d2-overtime">7</td>
+            <td id="sgt-d2-status">OK</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-d2')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-d2')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-d2')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-d3', 'Sergent D3')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent D3</button></td>
+            <td id="sgt-d3-hours">136</td>
+            <td id="sgt-d3-overtime">0</td>
+            <td id="sgt-d3-status">Under</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-d3')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-d3')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-d3')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <td><button onclick="showSergeantDetail('sgt-d4', 'Sergent D4')" style="background: none; border: none; color: #ffffff; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent D4</button></td>
+            <td id="sgt-d4-hours">159</td>
+            <td id="sgt-d4-overtime">22</td>
+            <td id="sgt-d4-status">Kritisk Overtid</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-d4')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-d4')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-d4')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+          <tr>
+            <td><button onclick="showSergeantDetail('sgt-d5', 'Sergent D5')" style="background: none; border: none; color: #3498db; text-decoration: underline; cursor: pointer; font-weight: bold;">Sergent D5</button></td>
+            <td id="sgt-d5-hours">133</td>
+            <td id="sgt-d5-overtime">0</td>
+            <td id="sgt-d5-status">Under</td>
+            <td>
+              <button onclick="showCurrentStatus('sgt-d5')" style="background-color: #3498db; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Status</button>
+              <button onclick="showAfspStatus('sgt-d5')" style="background-color: #e67e22; margin-right: 0.25rem; padding: 3px 6px; font-size: 11px;">Med AFSP</button>
+              <button onclick="activateAfspPlan('sgt-d5')" style="background-color: #34404B; padding: 3px 6px; font-size: 11px;">Aktivér</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OVERSIGT Tab -->
+    <div id="oversigt-tab" class="main-tab-content">
+      <h3>OVERBLIK - TOTAL TIMER PER DEL</h3>
+
+      <table id="oversigt-timer-table">
+        <thead>
+          <tr>
+            <th>DEL</th>
+            <th>Total Timer</th>
+            <th>Normal Timer (37/uge)</th>
+            <th>Overtimer</th>
+            <th>Konv. Opsparing</th>
+            <th>Ø-døgn</th>
+            <th>Fridage</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="del1-summary">
+            <td>1. DEL</td>
+            <td id="del1-total-hours">798</td>
+            <td>740</td>
+            <td id="del1-overtime">58</td>
+            <td id="del1-konv-opsparing">134</td>
+            <td id="del1-o-dogn">12</td>
+            <td id="del1-fridage">5</td>
+            <td id="del1-status">Overtid</td>
+          </tr>
+          <tr id="del2-summary">
+            <td>2. DEL</td>
+            <td id="del2-total-hours">772</td>
+            <td>740</td>
+            <td id="del2-overtime">32</td>
+            <td id="del2-konv-opsparing">98</td>
+            <td id="del2-o-dogn">11</td>
+            <td id="del2-fridage">4</td>
+            <td id="del2-status">Overtid</td>
+          </tr>
+          <tr id="del3-summary">
+            <td>3. DEL</td>
+            <td id="del3-total-hours">784</td>
+            <td>740</td>
+            <td id="del3-overtime">44</td>
+            <td id="del3-konv-opsparing">116</td>
+            <td id="del3-o-dogn">9</td>
+            <td id="del3-fridage">7</td>
+            <td id="del3-status">Overtid</td>
+          </tr>
+          <tr id="del4-summary">
+            <td>4. DEL</td>
+            <td id="del4-total-hours">793</td>
+            <td>740</td>
+            <td id="del4-overtime">53</td>
+            <td id="del4-konv-opsparing">127</td>
+            <td id="del4-o-dogn">13</td>
+            <td id="del4-fridage">6</td>
+            <td id="del4-status">Overtid</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- TOTAL for hele KMP -->
+      <h4 style="margin-top: 2rem; color: #e74c3c;">TOTAL - HELE KMP</h4>
+      <table id="oversigt-total-table" style="background-color: #f8f9fa;">
+        <thead>
+          <tr style="background-color: #e74c3c;">
+            <th>Kategori</th>
+            <th>Total Timer</th>
+            <th>Normal Timer</th>
+            <th>Total Overtimer</th>
+            <th>Total Konv. Opsparing</th>
+            <th>Total Ø-døgn</th>
+            <th>Total Fridage</th>
+            <th>Kritiske Sergenter (≥21t)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="font-weight: bold; background-color: #fff3cd;">
+            <td>HELE KMP</td>
+            <td id="total-all-hours">3147</td>
+            <td>2960</td>
+            <td id="total-all-overtime">187</td>
+            <td id="total-konv-opsparing">475</td>
+            <td id="total-o-dogn">45</td>
+            <td id="total-fridage">22</td>
+            <td id="critical-sergeants">7</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- KRITISKE SERGENTER LISTE -->
+      <h4 style="margin-top: 2rem; color: #dc3545;">KRITISKE SERGENTER (≥21 timer overtid)</h4>
+      <table style="background-color: #fff;">
+        <thead>
+          <tr style="background-color: #dc3545; color: #ffffff;">
+            <th>Navn</th>
+            <th>DEL</th>
+            <th>Overtimer</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent A1</strong></td>
+            <td>1. DEL</td>
+            <td>21</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent A4</strong></td>
+            <td>1. DEL</td>
+            <td>22</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent B1</strong></td>
+            <td>2. DEL</td>
+            <td>23</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent B4</strong></td>
+            <td>2. DEL</td>
+            <td>21</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent C2</strong></td>
+            <td>3. DEL</td>
+            <td>25</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent C4</strong></td>
+            <td>3. DEL</td>
+            <td>21</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent D1</strong></td>
+            <td>4. DEL</td>
+            <td>24</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+          <tr style="background-color: #ffebee;">
+            <td><strong>Sergent D4</strong></td>
+            <td>4. DEL</td>
+            <td>22</td>
+            <td style="color: #d32f2f;">Kritisk</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js'></script>
+  <script src="script.js"></script>
+</body>
+</html>

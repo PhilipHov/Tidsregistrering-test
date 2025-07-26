@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLANOPS - Multi-Month View</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css' rel='stylesheet' />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: #f7f7f7;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    header h2 {
+      font-size: 1.5rem;
+      margin: 0;
+      color: #34495e;
+      font-weight: normal;
+    }
+
+    .controls {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .subjects {
+      margin-bottom: 1rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin: 0.25rem;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    input[type="date"], select {
+      padding: 0.5rem;
+      margin: 0.25rem;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+
+    label {
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+
+    #multi-month-calendar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 1400px;
+      margin: 0 auto;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .month-calendar {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 300px;
+    }
+
+    .month-title {
+      text-align: center;
+      font-weight: bold;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PLANOPS</h1>
+    <h2>Arbejdstidsstyring - Multi-Month View</h2>
+  </header>
+
+  <div class="controls">
+    <h4>Opret ny AKOS</h4>
+
+    <div style="margin-bottom: 1rem;">
+      <label for="enhSelect">Vælg ENH:</label>
+      <select id="enhSelect" style="margin-right: 1rem;">
+        <option value="uddannelse">Uddannelsesenhed</option>
+        <option value="professionel">Professionel enhed</option>
+        <option value="lgr">LG: HBU/HRU</option>
+        <option value="ghr">GHR: HBU/HRU/MBU</option>
+      </select>
+    </div>
+
+    <div class="subjects">
+      <label>Plukark - Vælg fag/aktiviteter:</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="Basisteori" checked> Basisteori</label>
+        <label><input type="checkbox" id="Hvervning" checked> Hvervning</label>
+        <label><input type="checkbox" id="CBRN" checked> CBRN</label>
+        <label><input type="checkbox" id="Skydning" checked> Skydning</label>
+        <label><input type="checkbox" id="Våbenuddannelse" checked> Våbenuddannelse</label>
+        <label><input type="checkbox" id="Fysisk træning" checked> Fysisk træning</label>
+        <label><input type="checkbox" id="Eksercits" checked> Eksercits</label>
+        <label><input type="checkbox" id="Feltøvelser" checked> Feltøvelser</label>
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <label for="startDate">Samlet startdato:</label>
+      <input type="date" id="startDate" value="2025-08-01" />
+      <label for="endDate">Samlet slutdato:</label>
+      <input type="date" id="endDate" value="2025-12-31" />
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <button id="generateBtn">Generér AKOS</button>
+      <button id="importAkosBtn">Hent AKOS fra anden ENH</button>
+    </div>
+  </div>
+
+  <div id="multi-month-calendar">
+    <!-- Month calendars will be inserted here -->
+  </div>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js'></script>
+  <script>
+    let calendars = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('multi-month-calendar');
+      
+      // Create 6 month calendars (August to December 2025)
+      const months = [
+        { name: 'August 2025', date: '2025-08-01' },
+        { name: 'September 2025', date: '2025-09-01' },
+        { name: 'Oktober 2025', date: '2025-10-01' },
+        { name: 'November 2025', date: '2025-11-01' },
+        { name: 'December 2025', date: '2025-12-01' },
+        { name: 'Januar 2026', date: '2026-01-01' }
+      ];
+
+      months.forEach((month, index) => {
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'month-calendar';
+        monthDiv.id = `calendar-${index}`;
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'month-title';
+        titleDiv.textContent = month.name;
+        monthDiv.appendChild(titleDiv);
+        
+        const calendarDiv = document.createElement('div');
+        calendarDiv.id = `calendar-container-${index}`;
+        monthDiv.appendChild(calendarDiv);
+        
+        container.appendChild(monthDiv);
+
+        const monthCalendar = new FullCalendar.Calendar(calendarDiv, {
+          initialView: 'dayGridMonth',
+          initialDate: month.date,
+          headerToolbar: {
+            left: '',
+            center: '',
+            right: ''
+          },
+          editable: true,
+          selectable: true,
+          eventColor: '#378006',
+          events: [],
+          dayMaxEvents: false,
+          height: 280,
+          aspectRatio: 1.2,
+          validRange: {
+            start: month.date,
+            end: index === 5 ? '2026-02-01' : months[index + 1].date
+          }
+        });
+
+        monthCalendar.render();
+        calendars.push(monthCalendar);
+      });
+
+      // Store calendars globally
+      window.allCalendars = calendars;
+
+      document.getElementById('generateBtn').addEventListener('click', generateAKOS);
+      document.getElementById('importAkosBtn').addEventListener('click', importFromOtherENH);
+
+      // Load saved events
+      const savedEvents = localStorage.getItem('planops_events');
+      if (savedEvents) {
+        const events = JSON.parse(savedEvents);
+        events.forEach(event => {
+          const eventDate = new Date(event.start);
+          const monthIndex = eventDate.getMonth() - 7; // August = 7, so August = index 0
+          if (monthIndex >= 0 && monthIndex < calendars.length) {
+            calendars[monthIndex].addEvent({
+              title: event.title,
+              start: event.start,
+              allDay: true,
+              backgroundColor: event.backgroundColor || '#378006',
+              borderColor: event.borderColor || '#378006'
+            });
+          }
+        });
+      }
+    });
+
+    // Simplified generateAKOS function for multi-month view
+    async function generateAKOS() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) {
+        alert('Vælg start- og slutdato.');
+        return;
+      }
+
+      // Clear all calendars
+      calendars.forEach(cal => {
+        cal.getEvents().forEach(event => event.remove());
+      });
+
+      // Add some sample events
+      const sampleEvents = [
+        { title: 'Basisteori: BT 1', start: '2025-08-04', color: '#378006' },
+        { title: 'Skydning: Grundlæggende', start: '2025-08-05', color: '#45B7D1' },
+        { title: 'Feltøvelse: Uge 1', start: '2025-08-11', end: '2025-08-15', color: '#8B4513' },
+        { title: 'CBRN: Introduktion', start: '2025-09-02', color: '#4ECDC4' },
+        { title: 'Eksercits: Marsjering', start: '2025-09-15', color: '#DDA0DD' },
+        { title: 'Feltøvelse: Uge 2', start: '2025-10-06', end: '2025-10-10', color: '#8B4513' },
+        { title: 'Våbenuddannelse: Vedligeholdelse', start: '2025-11-03', color: '#96CEB4' },
+        { title: 'Fysisk træning: Test', start: '2025-12-01', color: '#FFEAA7' }
+      ];
+
+      sampleEvents.forEach(event => {
+        const eventDate = new Date(event.start);
+        const monthIndex = eventDate.getMonth() - 7;
+        if (monthIndex >= 0 && monthIndex < calendars.length) {
+          calendars[monthIndex].addEvent({
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            allDay: true,
+            backgroundColor: event.color,
+            borderColor: event.color
+          });
+        }
+      });
+
+      alert('AKOS genereret! Se alle 6 måneder i grid-layoutet.');
+    }
+
+    function importFromOtherENH() {
+      alert('Import funktion tilføjes snart...');
+    }
+  </script>
+</body>
+</html> 

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .test-area { border: 2px solid red; padding: 20px; margin: 20px 0; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Simple Test</h1>
+  
+  <div class="test-area">
+    <h3>Test 1: Basic HTML</h3>
+    <p>Hvis du kan se denne tekst, virker HTML.</p>
+  </div>
+
+  <div class="test-area">
+    <h3>Test 2: JavaScript</h3>
+    <p id="js-test">JavaScript test...</p>
+  </div>
+
+  <div class="test-area">
+    <h3>Test 3: FullCalendar</h3>
+    <div id="calendar-test">Kalender test...</div>
+  </div>
+
+  <script>
+    // Test 2: JavaScript
+    document.getElementById('js-test').innerHTML = '<span class="success">✓ JavaScript virker!</span>';
+    
+    // Test 3: FullCalendar
+    function testFullCalendar() {
+      const testDiv = document.getElementById('calendar-test');
+      
+      // Check if FullCalendar is loaded
+      if (typeof FullCalendar === 'undefined') {
+        testDiv.innerHTML = '<span class="error">✗ FullCalendar er ikke indlæst</span>';
+        return;
+      }
+      
+      testDiv.innerHTML = '<span class="success">✓ FullCalendar er indlæst</span>';
+      
+      // Try to create a simple calendar
+      try {
+        const calendar = new FullCalendar.Calendar(testDiv, {
+          initialView: 'dayGridMonth',
+          initialDate: '2025-08-01',
+          events: [
+            { title: 'Test Event', start: '2025-08-15' }
+          ]
+        });
+        calendar.render();
+        testDiv.innerHTML += '<br><span class="success">✓ Kalender oprettet og vist</span>';
+      } catch (error) {
+        testDiv.innerHTML += '<br><span class="error">✗ Fejl ved oprettelse af kalender: ' + error.message + '</span>';
+      }
+    }
+    
+    // Load FullCalendar and test
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js';
+    script.onload = function() {
+      console.log('FullCalendar loaded');
+      testFullCalendar();
+    };
+    script.onerror = function() {
+      document.getElementById('calendar-test').innerHTML = '<span class="error">✗ Kunne ikke indlæse FullCalendar</span>';
+    };
+    document.head.appendChild(script);
+  </script>
+</body>
+</html> 
