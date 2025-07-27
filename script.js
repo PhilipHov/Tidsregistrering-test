@@ -414,7 +414,37 @@ function createDetaljeretTidTable(data) {
       const th = document.createElement('th');
       th.className = 'day-header';
       th.colSpan = periods.length;
-      th.innerHTML = `${lbl}`;
+      
+      // Opret container for dag og dato
+      const dayContainer = document.createElement('div');
+      dayContainer.className = 'day-header-container';
+      
+      // Dag label
+      const dayLabel = document.createElement('div');
+      dayLabel.textContent = lbl;
+      dayLabel.className = 'day-label';
+      
+      // Dato input
+      const dateInput = document.createElement('input');
+      dateInput.type = 'text';
+      dateInput.className = 'date-input';
+      dateInput.placeholder = 'dd.mm.yy';
+      dateInput.id = `uge-${weekIndex + 1}-dag-${idx + 1}-date`;
+      
+      // Gem dato i localStorage hvis den findes
+      const savedDate = localStorage.getItem(`uge-${weekIndex + 1}-dag-${idx + 1}-date`);
+      if (savedDate) {
+        dateInput.value = savedDate;
+      }
+      
+      // Gem dato når brugeren ændrer den
+      dateInput.addEventListener('change', function() {
+        localStorage.setItem(`uge-${weekIndex + 1}-dag-${idx + 1}-date`, this.value);
+      });
+      
+      dayContainer.appendChild(dayLabel);
+      dayContainer.appendChild(dateInput);
+      th.appendChild(dayContainer);
       tr1.appendChild(th);
     });
     
