@@ -488,6 +488,7 @@ function createDetaljeretTidTable(data) {
   }
 
   console.log("Opretter 4 ugers skemaer med tidsintervaller...");
+  console.log("Version med redigerbare dato felter - cache refresh");
 
   // generér fire uger
   for (let w = 0; w < 4; w++) {
