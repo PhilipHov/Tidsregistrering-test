@@ -16,6 +16,7 @@
   <div class="main-tabs-container">
     <div class="main-tabs">
       <button class="main-tab-button active" onclick="showMainTab('akos')">AKOS</button>
+      <button class="main-tab-button" onclick="showMainTab('detaljeret')">DETALJERET TID</button>
       <button class="main-tab-button" onclick="showMainTab('skema')">SKEMA</button>
       <button class="main-tab-button" onclick="showMainTab('arbtid')">ARBEJDSTID</button>
       <button class="main-tab-button" onclick="showMainTab('oversigt')">OVERSIGT</button>
@@ -626,6 +627,12 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Detaljeret Tid Tab -->
+          <div id="detaljeret-tab" class="main-tab-content">
+        <h2>Detaljeret Tid – Tavleoversigt</h2>
+        <div id="timetable-container"></div>
+      </div>
   </div>
 
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js'></script>

@@ -1,0 +1,98 @@
+{
+  "Uge 1": {
+    "Mandag": {
+      "08:00-10:00": "Basisteori: Grundlæggende teori",
+      "10:15-12:00": "Hvervning: Præsentation",
+      "13:00-15:00": "CBRN: Grundlæggende prinsipper",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Tirsdag": {
+      "08:00-10:00": "Skydning: Sikkerhed og grundlæggende teknikker",
+      "10:15-12:00": "Våbenuddannelse: Våbenhåndtering",
+      "13:00-15:00": "Eksercits: Grundlæggende kommandoer",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Onsdag": {
+      "08:00-10:00": "Feltøvelser: Orientering",
+      "10:15-12:00": "Basisteori: Avanceret teori",
+      "13:00-15:00": "Hvervning: Praktiske øvelser",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Torsdag": {
+      "08:00-10:00": "CBRN: Praktiske øvelser",
+      "10:15-12:00": "Skydning: Målskydning",
+      "13:00-15:00": "Våbenuddannelse: Vedligeholdelse",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Fredag": {
+      "08:00-10:00": "Eksercits: Avancerede kommandoer",
+      "10:15-12:00": "Feltøvelser: Taktik",
+      "13:00-15:00": "Basisteori: Eksamen",
+      "15:15-16:00": "Fysisk træning"
+    }
+  },
+  "Uge 2": {
+    "Mandag": {
+      "08:00-10:00": "Hvervning: Avancerede teknikker",
+      "10:15-12:00": "CBRN: Beskyttelsesudstyr",
+      "13:00-15:00": "Skydning: Bevægelsesskydning",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Tirsdag": {
+      "08:00-10:00": "Våbenuddannelse: Avancerede teknikker",
+      "10:15-12:00": "Eksercits: Komplekse manøvrer",
+      "13:00-15:00": "Feltøvelser: Natteksercits",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Onsdag": {
+      "08:00-10:00": "Basisteori: Praktisk anvendelse",
+      "10:15-12:00": "Hvervning: Kommunikation",
+      "13:00-15:00": "CBRN: Dekontaminering",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Torsdag": {
+      "08:00-10:00": "Skydning: Konkurrenceskydning",
+      "10:15-12:00": "Våbenuddannelse: Specialvåben",
+      "13:00-15:00": "Eksercits: Paradeøvelser",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Fredag": {
+      "08:00-10:00": "Feltøvelser: Overlevelse",
+      "10:15-12:00": "Basisteori: Evalueringsøvelse",
+      "13:00-15:00": "Hvervning: Afsluttende præsentation",
+      "15:15-16:00": "Fysisk træning"
+    }
+  },
+  "Uge 3": {
+    "Mandag": {
+      "08:00-10:00": "CBRN: Avancerede scenarier",
+      "10:15-12:00": "Skydning: Præcisionsskydning",
+      "13:00-15:00": "Våbenuddannelse: Taktisk anvendelse",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Tirsdag": {
+      "08:00-10:00": "Eksercits: Kommandostruktur",
+      "10:15-12:00": "Feltøvelser: Taktisk planlægning",
+      "13:00-15:00": "Basisteori: Strategisk tænkning",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Onsdag": {
+      "08:00-10:00": "Hvervning: Lederskab",
+      "10:15-12:00": "CBRN: Komplekse situationer",
+      "13:00-15:00": "Skydning: Stressskydning",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Torsdag": {
+      "08:00-10:00": "Våbenuddannelse: Specialoperationer",
+      "10:15-12:00": "Eksercits: Multinationale øvelser",
+      "13:00-15:00": "Feltøvelser: Urban krigsførelse",
+      "15:15-16:00": "Fysisk træning"
+    },
+    "Fredag": {
+      "08:00-10:00": "Basisteori: Afsluttende eksamen",
+      "10:15-12:00": "Hvervning: Certificering",
+      "13:00-15:00": "CBRN: Endelig evaluering",
+      "15:15-16:00": "Fysisk træning"
+    }
+  }
+} 

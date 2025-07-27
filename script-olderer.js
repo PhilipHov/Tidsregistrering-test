@@ -163,6 +163,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize computeHours on page load
   computeHours();
 
+  // Når JSON er indlæst
+  fetch("plukark.json")
+    .then(res => res.json())
+    .then(data => {
+      console.log("JSON-data indlæst:", data);
+      indsætFagIDetaljeretTid(data);
+      enableDragDrop(); // Aktiver drag & drop efter data er indsat
+    });
+
   // Aktiver drag & drop når siden indlæses
   window.addEventListener("load", enableDragDrop);
 });
@@ -314,160 +323,201 @@ function createDetaljeretTidTable(data) {
   const container = document.getElementById("timetable-container");
   container.innerHTML = "";
 
-  // Data for tider, ugedage og perioder
-  const timeSlots = [
-    '0745-0830', '0840-0925', '0945-1030', '1040-1125',
-    '1130-1215', '1215-1300', '1305-1350', '1400-1445', '1455-1540'
-  ];
-  const periods = ['1 DEL', '2 DEL', '3 DEL', '4 DEL'];
-  const dayKeys = ['man', 'tir', 'ons', 'tor', 'fre'];
-  const dayLabels = ['MAN', 'TIR', 'ONS', 'TOR', 'FRE'];
+  const ugedage = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag"];
+  const deler = ["1. DEL", "2. DEL", "3. DEL", "4. DEL"];
 
-  // Liste med fag at rotere imellem
-  const subjects = [
-    'BT 1: Introduktion',
-    'MD 806 – Kropssprog',
-    'HF time',
-    'SKYT 3: Skydetræning',
-    'HVER 2A: Kontrakt',
-    'MFT 803: Nærkamp',
-    'MD 807 – Historie',
-    'MD 808: ? ',
-    'MD 809 – CHHO',
-    'MD 810 – 1BDE/2BDE',
-    'MD 811 – BTN CH'
-  ];
-  
-  // Farver til de enkelte fag (rotér samme længde som subjects)
-  const colors = [
-    'graa', 'graa', 'graa', 'roed', 'gul', 'roed', 'graa',
-    'gul', 'gul', 'gul', 'gul'
-  ];
-
-  // Helper: genererer et scheduleData-objekt for en uge
-  function generateWeekData(weekIndex) {
-    const data = {};
-    dayKeys.forEach((dayKey, dayIdx) => {
-      data[dayKey] = {};
-      timeSlots.forEach((slot, slotIdx) => {
-        data[dayKey][slot] = [];
-        periods.forEach((_, periodIdx) => {
-          // Beregn index til subject-listen baseret på uge, dag, tidsrum og del
-          const subjIndex =
-            (weekIndex * 100 + dayIdx * 20 + slotIdx * 4 + periodIdx) %
-            subjects.length;
-          data[dayKey][slot].push({
-            text: subjects[subjIndex],
-            color: colors[subjIndex],
-            span: 1
-          });
-        });
-      });
-    });
-    return data;
-  }
-
-  // Helper: beregn dato-strenge for uger (starter fra 11/12/23)
-  function getWeekDates(startDateStr, weekOffset) {
-    // startDateStr format: dd.mm.yy
-    const [day, month, year] = startDateStr.split('.').map(Number);
-    const baseDate = new Date(`20${year}`, month - 1, day);
-    // start of this week
-    const weekDate = new Date(
-      baseDate.getTime() + weekOffset * 7 * 24 * 60 * 60 * 1000
-    );
-    const dates = [];
-    for (let i = 0; i < dayKeys.length; i++) {
-      const d = new Date(weekDate.getTime() + i * 24 * 60 * 60 * 1000);
-      const dd = String(d.getDate()).padStart(2, '0');
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const yy = String(d.getFullYear()).slice(-2);
-      dates.push(`${dd}.${mm}.${yy}`);
+  // Opret komplet ugedata baseret på plukark.json
+  const eksempelData = {
+    "Uge 1": {
+      "Mandag": [
+        "BT 1: Introduktion til militæret (2t)",
+        "HVER 1: Rekruttering proces (2t)",
+        "CBRN 1: Kemiske trusler (3t)",
+        "MFT 1: Konditionstræning grundlag (2t)"
+      ],
+      "Tirsdag": [
+        "SKYT 1: Våbensikkerhed teori (2t)",
+        "SKYT 2: Sigte teknik (3t)",
+        "GV 1: Håndvåben introduktion (2t)",
+        "MFT 2: Styrketræning (2t)"
+      ],
+      "Onsdag": [
+        "FELT 1: Basis feltfærdigheder (5 dage)",
+        "BT 2: Militære værdier (2t)",
+        "HVERV 2A: Kontrakt og vilkår del 1 (2t)",
+        "CBRN 2: Biologiske trusler (3t)"
+      ],
+      "Torsdag": [
+        "EKS 1: March øvelser grundlag (2t)",
+        "GV 2: Håndvåben praksis (4t)",
+        "MFT 3: Udholdenhed opbygning (2t)",
+        "SKYT 3: Skydebane øvelser dag 1 (4t)"
+      ],
+      "Fredag": [
+        "BT 3: Kommandostruktur (2t)",
+        "CBRN 3: Radiologiske trusler (3t)",
+        "EKS 2: Formation træning (2t)",
+        "MFT 4: Militær fitness test forberedelse (2t)"
+      ]
+    },
+    "Uge 2": {
+      "Mandag": [
+        "BT 4: Sikkerhed og sikring (3t)",
+        "CBRN 4: Nukleare trusler (3t)",
+        "MFT 5: Teambuilding øvelser (3t)",
+        "SKYT 4: Skydebane øvelser dag 2 (4t)"
+      ],
+      "Tirsdag": [
+        "HVERV 2B: Kontrakt og vilkår del 2 (2t)",
+        "EKS 3: Ceremonier introduktion (2t)",
+        "FELT 2: Avanceret taktik (5 dage)",
+        "GV 3: Automatvåben teori (2t)"
+      ],
+      "Onsdag": [
+        "BT 5: Første hjælp (4t)",
+        "SKYT 5: Præcisionsskydning (4t)",
+        "MFT 6: Militær fitness test (4t)",
+        "CBRN 5: Beskyttelsesudstyr (4t)"
+      ],
+      "Torsdag": [
+        "EKS 4: Parade træning dag 1 (3t)",
+        "GV 4: Automatvåben praksis (4t)",
+        "SKYT 6: Kampskyning (6t)",
+        "MFT 7: Rehabilitering og skadeforebyggelse (2t)"
+      ],
+      "Fredag": [
+        "HVERV 3: Karriereveje (3t)",
+        "BT 6: Kommunikation (2t)",
+        "FELT 2: Avanceret taktik (5 dage)",
+        "SKYT 7: Vedligeholdelse (2t)"
+      ]
+    },
+    "Uge 3": {
+      "Mandag": [
+        "BT 7: Navigation (3t)",
+        "CBRN 6: Dekontaminering (4t)",
+        "MFT 8: Avanceret konditionstræning (2t)",
+        "GV 5: Støttevåben (4t)"
+      ],
+      "Tirsdag": [
+        "SKYT 8: Natskydning (4t)",
+        "EKS 5: Parade træning dag 2 (3t)",
+        "FELT 2: Avanceret taktik (5 dage)",
+        "SKYT 9: Evaluering (3t)"
+      ],
+      "Onsdag": [
+        "BT 8: Våbensikkerhed (2t)",
+        "HVERV 4: Forfremmelse (2t)",
+        "CBRN 7: Praktisk øvelse (6t)",
+        "MFT 6: Militær fitness test (4t)"
+      ],
+      "Torsdag": [
+        "EKS 6: Kommando og kontrol (2t)",
+        "GV 6: Vedligeholdelse grundlæggende (3t)",
+        "FELT 2: Avanceret taktik (5 dage)",
+        "SKYT 10: Afsluttende test (4t)"
+      ],
+      "Fredag": [
+        "BT 9: Taktiske principper (3t)",
+        "CBRN 7: Praktisk øvelse (6t)",
+        "HVERV 5: Ansvar og rettigheder (2t)",
+        "MFT 8: Avanceret konditionstræning (2t)"
+      ]
+    },
+    "Uge 4": {
+      "Mandag": [
+        "BT 10: Militær historie (2t)",
+        "SKYT 10: Afsluttende test (4t)",
+        "EKS 7: Præsentation øvelser (3t)",
+        "MFT 6: Militær fitness test (4t)"
+      ],
+      "Tirsdag": [
+        "FELT 2: Avanceret taktik (5 dage)",
+        "HVERV 6: Arbejdsmiljø (2t)",
+        "CBRN 7: Praktisk øvelse (6t)",
+        "SKYT 9: Evaluering (3t)"
+      ],
+      "Onsdag": [
+        "BT 11: Folkeret (2t)",
+        "GV 7: Vedligeholdelse avanceret (3t)",
+        "MFT 7: Rehabilitering og skadeforebyggelse (2t)",
+        "CBRN 7: Praktisk øvelse (6t)"
+      ],
+      "Torsdag": [
+        "EKS 8: Afsluttende ceremoni (4t)",
+        "SKYT 8: Natskydning (4t)",
+        "FELT 2: Avanceret taktik (5 dage)",
+        "HVERV 7: Sociale forhold (2t)"
+      ],
+      "Fredag": [
+        "BT 12: Stress og mental sundhed (2t)",
+        "MFT 8: Avanceret konditionstræning (2t)",
+        "CBRN 7: Praktisk øvelse (6t)",
+        "SKYT 7: Vedligeholdelse (2t)"
+      ]
     }
-    return dates;
-  }
+  };
 
-  // Build a table for a given week
-  function buildWeekTable(weekIndex) {
-    const weekData = generateWeekData(weekIndex);
-    const dates = getWeekDates('11.12.23', weekIndex);
-    const table = document.createElement('table');
-    table.className = 'tidstabel uge-tabel';
-    table.id = `uge${weekIndex + 1}`;
+  Object.keys(eksempelData).forEach((ugeKey, ugeIndex) => {
+    const ugeData = eksempelData[ugeKey];
     
-    const caption = document.createElement('caption');
-    caption.textContent = `Uge ${weekIndex + 1}`;
-    table.appendChild(caption);
+    // Opret uge header
+    const ugeHeader = document.createElement("h3");
+    ugeHeader.textContent = ugeKey;
+    container.appendChild(ugeHeader);
     
-    const thead = document.createElement('thead');
-    const tr1 = document.createElement('tr');
-    const tr2 = document.createElement('tr');
+    // Opret tabel
+    const table = document.createElement("table");
+    table.className = "tidstabel uge-tabel";
+    table.id = `uge${ugeIndex + 1}`;
     
-    // venstre hjørne
-    const corner = document.createElement('th');
-    corner.className = 'time-col';
-    corner.rowSpan = 2;
-    corner.textContent = '';
-    tr1.appendChild(corner);
+    // Øverste række: Dage
+    const dagHeaderRow = document.createElement("tr");
+    dagHeaderRow.innerHTML = `<th></th>`; // Tom hjørnecelle
     
-    // dag/dato
-    dayLabels.forEach((lbl, idx) => {
-      const th = document.createElement('th');
-      th.className = 'day-header';
-      th.colSpan = periods.length;
-      th.innerHTML = `${lbl}<br>${dates[idx]}`;
-      tr1.appendChild(th);
+    ugedage.forEach((dag, dagIndex) => {
+      const dayCell = document.createElement("th");
+      dayCell.colSpan = 4;
+      dayCell.textContent = dag;
+      dagHeaderRow.appendChild(dayCell);
     });
+    table.appendChild(dagHeaderRow);
     
-    // 1-4 DEL
-    dayLabels.forEach(() => {
-      periods.forEach(period => {
-        const th = document.createElement('th');
-        th.textContent = period;
-        th.className = 'delHeader';
-        tr2.appendChild(th);
+    // Næste række: DEL headers
+    const delHeaderRow = document.createElement("tr");
+    delHeaderRow.innerHTML = `<th>Tid</th>`;
+    for (let i = 0; i < 5; i++) {
+      deler.forEach((del, delIndex) => {
+        const delCell = document.createElement("td");
+        delCell.textContent = del;
+        delCell.className = "delHeader";
+        delHeaderRow.appendChild(delCell);
       });
-    });
+    }
+    table.appendChild(delHeaderRow);
     
-    thead.appendChild(tr1);
-    thead.appendChild(tr2);
-    table.appendChild(thead);
-    
-    // tbody
-    const tbody = document.createElement('tbody');
-    timeSlots.forEach((slot, slotIndex) => {
-      const row = document.createElement('tr');
-      const timeTh = document.createElement('th');
-      timeTh.className = 'time-col';
-      timeTh.textContent = slot;
-      row.appendChild(timeTh);
+    // Indholdsrækker: 4 rækker (én per DEL)
+    const tidsintervaller = ["08:00-10:00", "10:15-12:00", "13:00-14:45", "15:15-16:00"];
+    for (let delIndex = 0; delIndex < 4; delIndex++) {
+      const contentRow = document.createElement("tr");
+      contentRow.innerHTML = `<td>${tidsintervaller[delIndex]}</td>`;
       
-      dayKeys.forEach((dayKey, dayIndex) => {
-        for (let p = 0; p < periods.length; p++) {
-          const cell = weekData[dayKey][slot][p];
-          const td = document.createElement('td');
-          td.id = `uge-${weekIndex + 1}-tid-${slotIndex + 1}-dag-${dayIndex + 1}-del-${p + 1}`;
-          td.textContent = cell.text;
-          if (cell.color) td.classList.add(cell.color);
-          row.appendChild(td);
-        }
+      ugedage.forEach((dag, dagIndex) => {
+        const cell = document.createElement("td");
+        cell.id = `uge-${ugeIndex + 1}-dag-${dagIndex + 1}-del-${delIndex + 1}`;
+        cell.textContent = "";
+        contentRow.appendChild(cell);
       });
-      tbody.appendChild(row);
-    });
-    table.appendChild(tbody);
+      table.appendChild(contentRow);
+    }
+    
     container.appendChild(table);
-  }
+  });
 
-  console.log("Opretter 4 ugers skemaer med tidsintervaller...");
-
-  // generér fire uger
-  for (let w = 0; w < 4; w++) {
-    buildWeekTable(w);
-  }
-
-  console.log("Alle 4 ugers skemaer oprettet!");
+  // Indsæt data
+  indsætFagIDetaljeretTid(eksempelData);
   
-  // Aktiver drag & drop efter tabellerne er oprettet
+  // Aktiver drag & drop efter tabellen er oprettet
   enableDragDrop();
 }
 
@@ -478,7 +528,24 @@ function getFarveklasse(fag) {
   return "";
 }
 
-// Denne funktion er erstattet af createDetaljeretTidTable - fjernet for at undgå konflikter
+function indsætFagIDetaljeretTid(data) {
+  const ugedage = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag"];
+  
+  Object.keys(data).forEach((ugeKey, ugeIndex) => {
+    const ugeData = data[ugeKey];
+    ugedage.forEach((dag, dagIndex) => {
+      if (ugeData[dag]) {
+        ugeData[dag].forEach((fag, delIndex) => {
+          const celle = document.querySelector(`#uge-${ugeIndex + 1}-dag-${dagIndex + 1}-del-${delIndex + 1}`);
+          if (celle) {
+            celle.textContent = fag;
+            celle.className = getFarveklasse(fag);
+          }
+        });
+      }
+    });
+  });
+}
 
 
 
@@ -646,7 +713,8 @@ async function generateAKOS() {
   while (currentDate <= end && fieldIndex < fieldExercises.length) {
     // Find mandag i den aktuelle uge
     const dayOfWeek = currentDate.getDay();
-    const daysToMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+    const days = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag"];
+
     currentDate.setDate(currentDate.getDate() + daysToMonday);
 
     if (currentDate > end) break;
