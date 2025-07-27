@@ -390,7 +390,6 @@ function createDetaljeretTidTable(data) {
   // Build a table for a given week
   function buildWeekTable(weekIndex) {
     const weekData = generateWeekData(weekIndex);
-    const dates = getWeekDates('11.12.23', weekIndex);
     const table = document.createElement('table');
     table.className = 'tidstabel uge-tabel';
     table.id = `uge${weekIndex + 1}`;
@@ -415,7 +414,7 @@ function createDetaljeretTidTable(data) {
       const th = document.createElement('th');
       th.className = 'day-header';
       th.colSpan = periods.length;
-      th.innerHTML = `${lbl}<br>${dates[idx]}`;
+      th.innerHTML = `${lbl}`;
       tr1.appendChild(th);
     });
     
