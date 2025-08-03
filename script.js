@@ -2791,3 +2791,4 @@ class PLANOPSChatbot {
 
 
 
+console.log('AI Chatbot loaded successfully');
