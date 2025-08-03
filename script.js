@@ -165,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Aktiver drag & drop når siden indlæses
   window.addEventListener("load", enableDragDrop);
+  
+  // Initialize AI chatbot
+  window.planopsChatbot = new PLANOPSChatbot();
 });
 
 // Get sergeants for a specific DEL
@@ -2553,4 +2556,238 @@ function enableDragDrop() {
     });
   });
 }
+
+// AI Chatbot Functionality
+class PLANOPSChatbot {
+  constructor() {
+    this.isOpen = false;
+    this.isTyping = false;
+    this.conversationHistory = [];
+    this.init();
+  }
+
+  init() {
+    this.bindEvents();
+    this.loadConversationHistory();
+  }
+
+  bindEvents() {
+    // Toggle chatbot window
+    document.getElementById('chatbot-toggle').addEventListener('click', () => {
+      this.toggleChatbot();
+    });
+
+    // Close chatbot
+    document.getElementById('chatbot-close').addEventListener('click', () => {
+      this.closeChatbot();
+    });
+
+    // Send message on button click
+    document.getElementById('chatbot-send').addEventListener('click', () => {
+      this.sendMessage();
+    });
+
+    // Send message on Enter key
+    document.getElementById('chatbot-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.sendMessage();
+      }
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isOpen) {
+        this.closeChatbot();
+      }
+    });
+  }
+
+  toggleChatbot() {
+    this.isOpen = !this.isOpen;
+    const window = document.getElementById('chatbot-window');
+    
+    if (this.isOpen) {
+      window.classList.add('active');
+      document.getElementById('chatbot-input').focus();
+      this.scrollToBottom();
+    } else {
+      window.classList.remove('active');
+    }
+  }
+
+  closeChatbot() {
+    this.isOpen = false;
+    document.getElementById('chatbot-window').classList.remove('active');
+  }
+
+  async sendMessage() {
+    const input = document.getElementById('chatbot-input');
+    const message = input.value.trim();
+    
+    if (!message || this.isTyping) return;
+
+    // Clear input
+    input.value = '';
+
+    // Add user message
+    this.addMessage(message, 'user');
+
+    // Show typing indicator
+    this.showTypingIndicator();
+
+    // Generate AI response
+    const response = await this.generateResponse(message);
+
+    // Hide typing indicator
+    this.hideTypingIndicator();
+
+    // Add bot response
+    this.addMessage(response, 'bot');
+
+    // Save conversation
+    this.saveConversationHistory();
+  }
+
+  addMessage(content, sender) {
+    const messagesContainer = document.getElementById('chatbot-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    // Convert markdown-like formatting to HTML
+    const formattedContent = this.formatMessage(content);
+    contentDiv.innerHTML = formattedContent;
+    
+    messageDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(messageDiv);
+    
+    this.scrollToBottom();
+    
+    // Add to conversation history
+    this.conversationHistory.push({ sender, content, timestamp: new Date() });
+  }
+
+  formatMessage(content) {
+    // Convert **bold** to <strong>bold</strong>
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *italic* to <em>italic</em>
+    content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convert line breaks to <br>
+    content = content.replace(/\n/g, '<br>');
+    
+    return content;
+  }
+
+  showTypingIndicator() {
+    this.isTyping = true;
+    const messagesContainer = document.getElementById('chatbot-messages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message bot-message';
+    typingDiv.id = 'typing-indicator';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'typing-indicator';
+    contentDiv.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    
+    typingDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(typingDiv);
+    this.scrollToBottom();
+  }
+
+  hideTypingIndicator() {
+    this.isTyping = false;
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+
+  scrollToBottom() {
+    const messagesContainer = document.getElementById('chatbot-messages');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  async generateResponse(userMessage) {
+    // Simulate AI processing delay
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+
+    const message = userMessage.toLowerCase();
+    
+    // Knowledge base for PLANOPS system
+    const responses = {
+      // AKOS related
+      'akos': '**AKOS** (Arbejds- og Kompetenceorienteret Semesterplan) er et værktøj til at planlægge og strukturere undervisning og aktiviteter over et semester. Du kan:\n\n• Vælge fag og aktiviteter fra plukarket\n• Sætte start- og slutdatoer\n• Generere automatiske tidsplaner\n• Importere AKOS fra andre enheder\n\nHvad specifikt vil du vide om AKOS?',
+      
+      'detaljeret tid': '**Detaljeret Tid** viser en uge-for-uge oversigt over alle aktiviteter og tidsforbrug. Her kan du:\n\n• Se detaljerede tidsplaner for hver uge\n• Redigere aktiviteter direkte i tabellen\n• Følge tidsforbrug for forskellige fag\n• Planlægge transport og klargøring\n\nVil du have hjælp til at navigere i detaljeret tid?',
+      
+      'skema': '**Skema** funktionen giver dig mulighed for at:\n\n• Generere ugevisninger af aktiviteter\n• Vælge mellem forskellige DEL\'er (1-4)\n• Se detaljerede skemaer med dato, tid, enh, aktivitet, leder, påklædning og sted\n• Planlægge aktiviteter systematisk\n\nHvilken DEL vil du arbejde med?',
+      
+      'arbejdstid': '**Arbejdstid** modulet hjælper med at:\n\n• Overvåge timer og overtid for alle sergenter\n• Håndtere AFSP (Afspadsering) planer\n• Identificere kritiske overtidsituationer\n• Generere individuelle kalendere\n• Planlægge afspadsering automatisk\n\nVil du se status for en specifik sergent?',
+      
+      'oversigt': '**Oversigt** giver dig et totalt overblik over:\n\n• Total timer per DEL\n• Overtimer og konverteringsopsparing\n• Ø-døgn og fridage\n• Kritiske sergenter (≥21 timer overtid)\n• Hele KMP\'s status\n\nDette er dit dashboard for hurtig beslutningstagning.',
+      
+      // General help
+      'hjælp': 'Jeg kan hjælpe dig med alle aspekter af PLANOPS systemet:\n\n**Hovedfunktioner:**\n• **AKOS** - Semesterplanlægning\n• **Detaljeret Tid** - Ugeoversigter\n• **Skema** - Aktivitetsskemaer\n• **Arbejdstid** - Timer og AFSP\n• **Oversigt** - Total overblik\n\n**Tips:**\n• Brug fanerne øverst til at navigere\n• Klik på sergentnavne for detaljer\n• Brug kalenderen til at planlægge aktiviteter\n\nHvad vil du lære mere om?',
+      
+      'hvordan': 'Her er en **trin-for-trin guide** til at bruge PLANOPS:\n\n**1. Start med AKOS:**\n• Vælg din ENH (Uddannelsesenhed, Professionel enhed, etc.)\n• Marker de fag du vil arbejde med\n• Sæt start- og slutdato\n• Klik "Generér AKOS"\n\n**2. Se detaljeret tid:**\n• Gå til "DETALJERET TID" fanen\n• Se uge-for-uge oversigt\n• Rediger aktiviteter direkte\n\n**3. Arbejd med skemaer:**\n• Vælg uge og DEL\n• Generer skema\n• Se alle detaljer\n\n**4. Overvåg arbejdstid:**\n• Check sergentstatus\n• Håndter AFSP planer\n• Se kritiske situationer\n\nHvilket trin vil du have mere hjælp med?',
+      
+      'fejl': 'Hvis du oplever **problemer** med PLANOPS:\n\n**Almindelige løsninger:**\n• Genindlæs siden (F5)\n• Tjek din internetforbindelse\n• Ryd browser cache\n• Prøv en anden browser\n\n**Specifikke problemer:**\n• **Kalender vises ikke:** Tjek om FullCalendar er indlæst\n• **Data gemmes ikke:** Tjek browser storage tilladelser\n• **Skema genereres ikke:** Kontroller at alle felter er udfyldt\n\nHvad specifikt sker der? Beskriv problemet, så kan jeg hjælpe dig videre.',
+      
+      'tips': 'Her er **nyttige tips** til at bruge PLANOPS effektivt:\n\n**Planlægning:**\n• Start altid med AKOS før du går til detaljeret tid\n• Brug plukarket systematisk - ikke alle fag behøves\n• Planlæg transport og klargøring med i tiden\n\n**Arbejdstid:**\n• Check oversigten regelmæssigt for kritiske sergenter\n• Brug AFSP planer automatisk for at reducere overtid\n• Hold øje med konverteringsopsparing\n\n**Navigation:**\n• Brug fanerne øverst til at skifte mellem funktioner\n• Klik på sergentnavne for detaljerede kalendere\n• Gem ofte - systemet gemmer automatisk\n\n**Kalender:**\n• Klik og træk for at oprette aktiviteter\n• Dobbeltklik for at redigere\n• Brug forskellige månedsvisninger\n\nHar du brug for flere tips om noget specifikt?'
+    };
+
+    // Check for specific keywords and return appropriate response
+    for (const [keyword, response] of Object.entries(responses)) {
+      if (message.includes(keyword)) {
+        return response;
+      }
+    }
+
+    // Check for specific questions
+    if (message.includes('hvad') && message.includes('akos')) {
+      return responses['akos'];
+    }
+    
+    if (message.includes('hvordan') && (message.includes('bruge') || message.includes('starte'))) {
+      return responses['hvordan'];
+    }
+    
+    if (message.includes('problem') || message.includes('fejl') || message.includes('virker ikke')) {
+      return responses['fejl'];
+    }
+
+    // Default response for unknown queries
+    return `Jeg forstår ikke helt dit spørgsmål. Prøv at spørge om:\n\n• **AKOS** - semesterplanlægning\n• **Detaljeret Tid** - ugeoversigter\n• **Skema** - aktivitetsskemaer\n• **Arbejdstid** - timer og AFSP\n• **Oversigt** - total overblik\n• **Tips** - nyttige råd\n• **Hjælp** - generel guide\n\nEller beskriv dit spørgsmål mere specifikt, så kan jeg hjælpe dig bedre!`;
+  }
+
+  saveConversationHistory() {
+    try {
+      localStorage.setItem('planops_chat_history', JSON.stringify(this.conversationHistory.slice(-50))); // Keep last 50 messages
+    } catch (e) {
+      console.warn('Could not save chat history:', e);
+    }
+  }
+
+  loadConversationHistory() {
+    try {
+      const saved = localStorage.getItem('planops_chat_history');
+      if (saved) {
+        this.conversationHistory = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Could not load chat history:', e);
+    }
+  }
+}
+
+
 
